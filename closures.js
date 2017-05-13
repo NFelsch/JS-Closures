@@ -214,7 +214,7 @@ function findPotentialFriends(existingFriends) {
     for (var i = 0; i < existingFriends.length; i++) {
       if (person === existingFriends[i]) {
         return false;
-      } 
+      }
     }
     return true;
   }
@@ -229,13 +229,13 @@ var isNotAFriend = findPotentialFriends(friends);
 method, find all potential second level friends as well as potential friends
 from allUsers. */
 
-var potentialSecondLevelFriends = secondLevelFriends.filter(function(friend) {
+var potentialSecondLevelFriends = secondLevelFriends.filter(function (friend) {
   return isNotAFriend(friend);
 });
 
 // var potentialSecondLevelFriends = secondlevelfriends.filter(isNotAFriend); <-- That one works too
 
-var allPotentialFriends = allUsers.filter(function(friend) {
+var allPotentialFriends = allUsers.filter(function (friend) {
   return isNotAFriend(friend);
 });
 
@@ -260,11 +260,43 @@ to 5. What we need to do is console.log(i) so that it logs like so:
  Fix the code below to log the desired output.
  */
 
+// function timeOutCounter() {
+//   for (var i = 0; i <= 5; i++) {
+//     setTimeout(function () {
+//       console.log(i)
+//     }, i * 1000)
+//   }
+// }
+// timeOutCounter();
+
+
 function timeOutCounter() {
   for (var i = 0; i <= 5; i++) {
-    setTimeout(function () {
-      console.log(i)
-    }, i * 1000)
+//         ↑ = To that
+//                   ↓
+    function closure(p1) {
+//                   ↑ Gets set or tracks i and what it was originally or to whatever we run before that
+//                      And then logs the remaining numbers, up until 5 
+//                         ↓
+      setTimeout(function () {
+        console.log(p1)
+      }, i * 1000)
+    }
+    closure(i); // ← Tracks the current number (i) and updates it for up there ↑ @ p1
+  }
+}
+timeOutCounter();
+
+
+
+function timeOutCounter() {
+  for (var i = 0; i <= 5; i++) {
+    function closure(p1) {
+      setTimeout(function () {
+        console.log(p1)
+      }, i * 1000)
+    }
+    closure(i); 
   }
 }
 timeOutCounter();
