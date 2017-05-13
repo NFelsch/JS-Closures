@@ -4,10 +4,12 @@
 
 function outer() {
   var name = 'Tyler';
-  return function() {
+  return function () {
     return 'The original name was ' + name;
   }
 }
+
+var inner = outer();
 
 /****** INSTRUCTIONS PROBLEM 1 ******/
 /* Above you're given a function that returns another function which has a
@@ -46,15 +48,11 @@ function callFriend(name) {
 Create a callJake function that when invoked with '435-555-9248' returns 'Calling Jake at 435-555-9248'
 in your console. */
 
-  //Code Here
+//Code Here
 
+var callJake = callFriend("Jake");
 
-
-
-
-
-
-
+// callJake.dial(435 - 555 - 928);
 
 /******************************************************************************\
 	#PROBLEM-03
@@ -66,22 +64,19 @@ properly. */
 
 //Code Here
 
-//Uncomment this once you make your function
-//   var count = makeCounter();
-//   count(); // 1
-//   count(); // 2
-//   count(); // 3
-//   count(); // 4
-
-
-
-
-
-
-
-
-
-
+function makeCounter() {
+  var icount = 0;
+  function countUp() {
+    icount++;
+    return icount;
+  }
+  return countUp;
+};
+var count = makeCounter();
+count(); // 1
+count(); // 2
+count(); // 3
+count(); // 4
 /******************************************************************************\
 	#PROBLEM-04
 \******************************************************************************/
@@ -94,33 +89,57 @@ function is responsible for decrementing the value by one. You will need to use
 the module pattern to achieve this. 
 Information on the module pattern available here: 
 http://stackoverflow.com/questions/17776940/javascript-module-pattern-with-example?answertab=votes#tab-top
-*/
+// */
+// function counterFactory() {
+//   var count = 0;
+//   function inc() {
+//     count++;
+//     return count;
+//   }
+//   function dec() {
+//     count--;
+//     return count;
+//   }
+//   return counterFactory;
+// };
 
-function counterFactory(value) {
+/*Closures Mantra
+closure is a function that returns a function or an object
+that closes over a variable (like symmetrical stairs )
+and returns that variable modified somehow*/
 
-  // Code here.
-
-
+function counterFactory(startingValue) {
+  var count = startingValue;
+  // return function() {
   return {
-  }
+    inc: function () {
+      count++;
+      return count;
+    },
+    dec: function () {
+      count--;
+      return count;
+    }
+  };
 }
-
-
-counter = counterFactory(10);
-// counter.inc() // 11
-// counter.inc() // 12
-// counter.inc() // 13
-// counter.dec() // 12
-
-
-
-
-
-
-
-
-
-
+// var counterFactory = (function() {
+//   var count = ;
+//   return {
+//     inc: function () {
+//       count = count + 1;
+//       return count;
+//     },
+//     dec: function () {
+//       count--;
+//       return count;
+//     }
+//   }
+// }
+var counter = counterFactory(10);
+counter.inc() // 11
+counter.inc() // 12
+counter.inc() // 13
+counter.dec() // 12
 /******************************************************************************\
 	#PROBLEM-05
 \******************************************************************************/
@@ -130,15 +149,11 @@ counter = counterFactory(10);
 will return 'You're doing awesome, keep it up firstname lastname.' */
 
 function motivation(firstname, lastname) {
-
-  var welcomeText = 'You\'re doing awesome, keep it up ';
-
-  // code message function here.
-
-
-  //Uncommment this to return the value of your invoked message function
-  //return message();
-
+  var welcomeText = "You're doing awesome, keep it up ";
+  function message() {
+    return welcomeText + firstname + ' ' + lastname + '.';
+  }
+  return message();
 }
 
 motivation('Billy', 'Bob'); // 'You're doing awesome keep it up Billy Bob.
@@ -161,24 +176,24 @@ motivation('Billy', 'Bob'); // 'You're doing awesome keep it up Billy Bob.
 invokes privateMethod. Invoke this by calling module.publicMethod(); outside
 the module scope */
 
-var module = (function() {
+var module = (function () {
   var person = {
     name: "phillip",
     age: 29,
     location: "Utah"
   };
-
-  function privateMethod(){
+  function privateMethod() {
     return "Hi, I'm " + person.name + ", age " + person.age + " from " + person.location;
   }
-
-  // Anything that is being returned is made public and can be invoked from
-  // outside our lexical scope
   return {
-    // Code here.
+    publicMethod: function () {
+      return privateMethod();
+    }
   };
 
 })();
+
+module.publicMethod();
 
 
 
@@ -195,14 +210,18 @@ var secondLevelFriends = ["Anne", "Harry", "Quinton"];
 var allUsers = ["Tom", "Dick", "Harry", "Anne", "Quinton", "Katie", "Mary"];
 
 function findPotentialFriends(existingFriends) {
-
+  return function (person) {
+    for (var i = 0; i < existingFriends.length; i++) {
+      if (person === existingFriends[i]) {
+        return false;
+      } 
+    }
+    return true;
+  }
 }
-
-var isNotAFriend = findPotentialFriends( friends );
+var isNotAFriend = findPotentialFriends(friends);
 // isNotAFriend(allUsers[0]); // false
 // isNotAFriend(secondLevelFriends[2]); // true
-
-
 /******************************************************************************\
  #PROBLEM-07 -- BLACK DIAMOND
  \******************************************************************************/
@@ -210,12 +229,19 @@ var isNotAFriend = findPotentialFriends( friends );
 method, find all potential second level friends as well as potential friends
 from allUsers. */
 
-var potentialSecondLevelFriends = "?";
-var allPotentialFriends = "?";
+var potentialSecondLevelFriends = secondLevelFriends.filter(function(friend) {
+  return isNotAFriend(friend);
+});
+
+// var potentialSecondLevelFriends = secondlevelfriends.filter(isNotAFriend); <-- That one works too
+
+var allPotentialFriends = allUsers.filter(function(friend) {
+  return isNotAFriend(friend);
+});
 
 
 /******************************************************************************\
-	#PROBLEM-08
+  #PROBLEM-08
 \******************************************************************************/
 
 /****** INSTRUCTIONS PROBLEM 8 ******/
@@ -230,15 +256,15 @@ to 5. What we need to do is console.log(i) so that it logs like so:
  However, because each call to console.log occurs after the loop has finished,
  the value of i has changed before the console.log executes. We'll need to use
  a closure to preserve a reference to i at the time of execution.
-
+ 
  Fix the code below to log the desired output.
  */
 
 function timeOutCounter() {
   for (var i = 0; i <= 5; i++) {
-    setTimeout(function() {
-    	console.log(i)
-	}, i * 1000)
+    setTimeout(function () {
+      console.log(i)
+    }, i * 1000)
   }
 }
 timeOutCounter();
